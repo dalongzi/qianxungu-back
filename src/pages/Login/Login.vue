@@ -55,7 +55,6 @@ export default {
           data.password = this.dataForm.password;
           if(captchaInput.toLowerCase() === captcha.toLowerCase()){
             this.$myaxios.post(this.$api.signin,data).then(resp=>{
-              console.log(resp.data.data.permissions);
               localStorage.setItem("token",resp.data.token);
               localStorage.setItem("permissionData",JSON.stringify(resp.data.data.permissions));
               if(!this.$route.query.higherRouting){

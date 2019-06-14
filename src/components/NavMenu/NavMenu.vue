@@ -8,31 +8,25 @@
       active-text-color="#ffd04b"
       router
     >
-      <el-submenu index="1">
-        <template slot="title">
+      <template v-for="item in data">
+        <el-submenu v-if="item.children" :index="item.permissionName">
+          <template slot="title">
+            <i class="el-icon-location"></i>
+            <span>{{item.permissionDesc}}</span>
+          </template>
+          <el-menu-item
+            v-for="(value,index) in item.children"
+            :key="index"
+            :index="value.permissionName"
+          >{{value.permissionDesc}}</el-menu-item>
+        </el-submenu>
+
+        <el-menu-item v-else :index="item.permissionName">
           <i class="el-icon-location"></i>
-          <span>系统管理</span>
-        </template>
-        <el-menu-item index="permission">权限管理</el-menu-item>
-        <el-menu-item index="role">角色管理</el-menu-item>
-        <el-menu-item index="admin">用户管理</el-menu-item>
-      </el-submenu>
-      <el-menu-item index="daily">
-        <i class="el-icon-location"></i>
-        <span slot="title">日历管理</span>
-      </el-menu-item>
-      <el-menu-item index="message">
-        <i class="el-icon-location"></i>
-        <span slot="title">留言管理</span>
-      </el-menu-item>
-      <el-menu-item index="musicType">
-        <i class="el-icon-location"></i>
-        <span slot="title">类型管理</span>
-      </el-menu-item>
-      <el-menu-item index="music">
-        <i class="el-icon-location"></i>
-        <span slot="title">音频管理</span>
-      </el-menu-item>
+          <span slot="title">{{item.permissionDesc}}</span>
+        </el-menu-item>
+      </template>
+
     </el-menu>
 
     <div class="nav-footer">
@@ -43,24 +37,54 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
-      defaultActive: '',
-      permissionData: []
-    }
+      defaultActive: "",
+      permissionData: [],
+      data: []
+    };
   },
   methods: {
     // 退出按钮
-    quitBtn(){
+    quitBtn() {
       localStorage.removeItem("token");
       localStorage.removeItem("permissionData");
-      this.$router.push({name: "login", query: {higherRouting: this.$route.fullPath} });
+      this.$router.push({
+        name: "login",
+        query: { higherRouting: this.$route.fullPath }
+      });
+    }
+  },
+  watch: {
+    permissionData(newQuestion, oldQuestion) {
+      const data = [];
+      const dataLeve2 = [];
+      for (var key in newQuestion) {
+        if (newQuestion[key].permissionLeve === 1) {
+          data.push(newQuestion[key]);
+        } else if (newQuestion[key].permissionLeve === 2) {
+          dataLeve2.push(newQuestion[key]);
+        }
+      }
+      for (var index in dataLeve2) {
+        for (var j in data) {
+          if (dataLeve2[index].parentid === data[j]._id) {
+            if (data[j].children) {
+              data[j].children.push(dataLeve2[index]);
+            } else {
+              data[j].children = [dataLeve2[index]];
+            }
+          }
+        }
+      }
+      this.data = data;
     }
   },
 
-  mounted(){
+  mounted() {
     this.defaultActive = this.$route.fullPath.split("/home/")[1];
     this.permissionData = JSON.parse(localStorage.getItem("permissionData"));
+    this.$store.dispatch("getPermissionData",this.permissionData);
   }
 };
 </script>
@@ -71,7 +95,7 @@ export default {
   height: 100%;
   background: #545c64;
   position: relative;
-  .nav-footer{
+  .nav-footer {
     height: 100px;
     position: absolute;
     left: 0;

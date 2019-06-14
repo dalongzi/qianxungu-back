@@ -21,6 +21,13 @@ router.beforeEach((to, from, next) => {
   }else{
     let token = localStorage.getItem("token");
     if(token){
+      setTimeout(()=>{
+        console.log(to.path.split("/"));
+        const permissionData = store.state.permissionData;
+        for(var key in permissionData){
+          // console.log(permissionData[key]);
+        }
+      },300);
       next();
     }else{
       next({path: "/login", query: {higherRouting: to.fullPath}});
