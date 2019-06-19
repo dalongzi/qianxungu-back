@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
         console.log(to.path.split("/"));
         const permissionData = store.state.permissionData;
         for(var key in permissionData){
-          // console.log(permissionData[key]);
+          console.log(permissionData[key]);
         }
       },300);
       next();
